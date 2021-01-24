@@ -1,0 +1,308 @@
+#include<Windows.h>
+#include<iostream>
+#include <gl/stb_image.h>
+#include<gl/glut.h>
+#include<ctime>
+using namespace std;
+#define STB_IMAGE_IMPLEMENTATION
+int Cx=0,Cy=0,Cz=0;
+int foodx,foodz;
+bool food=true;
+int gridx=18,gridz=18;
+unsigned int texture;
+int width, height, nrChannels;
+unsigned char *data = NULL;
+bool fullScreen;
+float ratio ;
+void background();
+void mydraw();
+void reshape( int , int );
+void timer( int );
+void keyboard ( unsigned char , int , int );
+void specialKeyboard (int , int , int);
+
+
+
+
+void main ( int argc , char** argv){
+	width = GetSystemMetrics(SM_CXSCREEN);
+	height = GetSystemMetrics(SM_CYSCREEN);
+	glutInit( &argc , argv);
+	glutInitDisplayMode(GLUT_RGB| GLUT_DOUBLE);
+	glutInitWindowSize(width,height);
+	glutCreateWindow(" 3D shapes and animation");
+	//glutFullScreen();
+	background();
+	glutDisplayFunc(mydraw);
+	glutReshapeFunc(reshape);
+
+	glutKeyboardFunc(keyboard);
+	glutSpecialFunc(specialKeyboard);
+	
+	glutMainLoop();
+}
+
+void background(){
+	glClearColor(0,0,0,1);
+	glEnable(GL_DEPTH_TEST);
+}
+//bta3t al mok3b el byt7rak 
+void theCube(){
+	glPushMatrix();
+    glColor3f(1,1,1);
+	glTranslatef(Cx,Cy,Cz);
+	
+	//bottom 
+	   glBegin(GL_QUADS);
+
+	   glColor3f(1,1,1);
+	   glVertex3i(0, 0, 0);
+	   glVertex3i(1, 0, 0);
+	   glVertex3i(1, 0, 1);
+	   glVertex3i(0, 0, 1);
+	   glEnd();
+	   //rigth
+	     glBegin(GL_QUADS);
+	   glColor3f(1,1,1);
+	   glVertex3i(1, 0, 0);
+	   glVertex3i(1, 0, 1);
+	   glVertex3i(1, 1, 1);
+	   glVertex3i(1, 1, 0);
+	   glEnd();
+	   //front
+	     glBegin(GL_QUADS);
+	   glColor3f(1,1,1);
+	   glVertex3i(1, 0, 1);
+	   glVertex3i(1, 1, 1);
+	   glVertex3i(0, 1, 1);
+	   glVertex3i(0, 0, 1);
+	   glEnd();
+	   //back
+	     glBegin(GL_QUADS);
+	   glColor3f(1,1,1);
+	   glVertex3i(1, 0, 0);
+	   glVertex3i(1, 1, 0);
+	   glVertex3i(0, 1, 0);
+	   glVertex3i(0, 0, 0);
+	   glEnd();
+	   //left
+	     glBegin(GL_QUADS);
+
+	   glColor3f(1,1,1);
+	    glVertex3i(1, 0, 1);
+	    glVertex3i(1, 1, 1);
+	   glVertex3i(1, 1, 0);
+	   glVertex3i(1, 0, 0);
+	   glEnd();
+	   //top
+	    glBegin(GL_QUADS);
+
+	   glColor3f(1,0,1);
+	   glVertex3i(0, 1, 0);
+	   glVertex3i(1, 1, 0);
+	   glVertex3i(1, 1, 1);
+	   glVertex3i(0, 1, 1);
+	   glEnd();	     
+	glPopMatrix();
+
+	  
+
+
+}
+// da al code al feh al loop al rasmet 18818 orba3 lel background 
+void drawgrid(){
+int i;
+for (i=0;i<40;i++){
+	glPushMatrix();
+	if (i<20){
+		glTranslatef(0,0,i);
+	}
+	if (i>=20){
+		glTranslatef(i-20,0,0);
+		glRotatef(-90,0,1,0);
+	}
+	
+	glBegin(GL_LINES);
+	glColor3f(1,.6,0);
+	glLineWidth(1);
+	glVertex3f( 0,-0.1,0);
+    glVertex3f(19,-0.1,0);
+
+	glEnd();
+	glPopMatrix();
+}
+
+}
+// al 7agez al f al nos al abyad da  
+void drawboxes(){
+	//bottom
+	
+	glPushMatrix();
+	//load(1);
+		glBegin(GL_QUADS);
+		glColor3f(1, 1, 1);
+	//	glTexCoord2d(0.0f,0.0f);
+		glVertex3i(8, 0, 15);
+		//glTexCoord2d(8.0f,0.0f);
+		glVertex3i(11, 0, 15);	
+		//glTexCoord2d(8.0f,8.0f);
+		glVertex3i(11, 0, 5);	
+	//	glTexCoord2d(0.0f,8.0f);
+		glVertex3i(8, 0, 5);	
+		glEnd();
+	glPopMatrix();
+	//top
+	glPushMatrix();
+	//load(1);
+		glBegin(GL_QUADS);
+		
+		glTexCoord2d(0.0f,0.0f);
+		glVertex3i(8, 2, 15);
+		glTexCoord2d(8.0f,0.0f);
+		glVertex3i(11, 2, 15);	
+		glTexCoord2d(8.0f,8.0f);
+		glVertex3i(11, 2, 5);
+		glTexCoord2d(0.0f,8.0f);
+		glVertex3i(8, 2, 5);	
+		glEnd();
+	glPopMatrix();
+	//right
+	glPushMatrix();
+		glBegin(GL_QUADS);
+		glColor3f(1, 1, 1);
+		glVertex3i(11, 0, 15);	
+		glVertex3i(11, 0, 5);	
+		glVertex3i(11, 2, 5);	
+		glVertex3i(11, 2, 5);	
+		glEnd();
+	glPopMatrix();
+	//left
+		glPushMatrix();
+		glBegin(GL_QUADS);
+		glColor3f(1, 1, 1);
+		glVertex3i(8, 0, 15);	
+		glVertex3i(8, 0, 5);	
+		glVertex3i(8, 2, 5);	
+		glVertex3i(8, 2, 15);	
+		glEnd();
+	glPopMatrix();
+	//front
+		glPushMatrix();
+		glBegin(GL_QUADS);
+		glColor3f(1, 1, 1);
+		glVertex3i(8, 0, 15);
+		glVertex3i(11, 0, 15);	
+		glVertex3i(11, 2, 15);	
+		glVertex3i(8, 2, 15);	
+		glEnd();
+	glPopMatrix();
+	//back
+	glPushMatrix();
+		glBegin(GL_QUADS);
+		glColor3f(1, 1, 1);
+		glVertex3i(8, 0,5);
+		glVertex3i(11, 0,5);	
+		glVertex3i(11, 2,5);	
+		glVertex3i(8, 2,5);	
+		glEnd();
+	glPopMatrix();
+	
+
+
+}
+void drawfood(){
+	
+	/*if (food)
+      random(foodx);
+	food=false;*/
+	glPushMatrix();
+		glBegin(GL_QUADS);
+		glColor3f(1, 1, 1);
+		glVertex3i(3, 0,4);
+		glVertex3i(4, 0,4);	
+		glVertex3i(4, 0,3);	
+		glVertex3i(3, 0,3);	
+		glEnd();
+	glPopMatrix();
+}
+
+void random(int X){
+	
+	 srand((unsigned)time(NULL)); 
+    X=rand()%18;  
+    cout<<X<<endl;
+	
+	
+
+}
+void mydraw(){
+	glClear( GL_COLOR_BUFFER_BIT |	GL_DEPTH_BUFFER_BIT);
+	
+	glLoadIdentity();
+	glTranslatef(-10,2,-50);
+	glRotatef(40,1,0,0);
+	drawgrid();
+	theCube();
+	drawboxes();
+	drawfood();
+//	random(foodx);
+	glutSwapBuffers();
+}
+
+void reshape( int w , int h ){
+	if( h == 0 ) h = 1 ;
+	ratio = w / (float)h ; 
+	glViewport(0,0,w,h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(42,ratio,1,1000);
+	glMatrixMode(GL_MODELVIEW);
+}
+
+void keyboard ( unsigned char key, int x, int y){
+	if( key == 27)
+		exit(0);
+}
+
+void specialKeyboard (int key, int x, int y){
+	if( key == GLUT_KEY_F1){
+		fullScreen = !fullScreen;
+		if(fullScreen)
+			glutFullScreen();
+		else{
+			glutPositionWindow(10,10);
+			glutReshapeWindow(600,600);
+		}
+	}
+	
+	switch (key)
+	{
+	/if(Cx==foodx &&Cz==foodx)
+		food=true;
+	case GLUT_KEY_LEFT:
+		if(Cx-1>=0)
+	      Cx-=1;
+		else Cx=18;
+		break;
+	case GLUT_KEY_RIGHT:
+		if(Cx+1<19)
+			Cx+=1;
+		else Cx=0;
+		break;
+	case GLUT_KEY_DOWN:
+		if(Cz+1<19)
+	      Cz+=1;
+		else Cz=0;
+		break;
+	case GLUT_KEY_UP:
+		if(Cz-1>=0)
+	      Cz-=1;
+		else Cz=18;
+
+		break;
+		
+	}
+	
+	
+		glutPostRedisplay();	
+}
